@@ -1,6 +1,5 @@
 #include "symengine/visitor.h"
 #include "visitor.h"
-#include "../symengine/printer.h"
 
 using namespace SymEngine;
 
@@ -17,25 +16,13 @@ static std::ostream& ident(std::ostream& o, int ident_) {
   return o;
 }
 
-std::vector<std::string> init_str_printer_names()
-{
-  std::vector<std::string> names;
-  names.assign(TypeID_Count, "");
-#define SYMENGINE_INCLUDE_ALL
-#define SYMENGINE_ENUM(type, Class) names[type] = #Class;
-#include "symengine/type_codes.inc"
-#undef SYMENGINE_ENUM
-#undef SYMENGINE_INCLUDE_ALL
-  return names;
-}
-
 std::ostream& operator<<(std::ostream& o, const AST& i) {
   thread_local static int ident_ = 0;
-  ident(o, ident_) << "<" << i.type << " " << i.name << (i.content.empty() ? "/>" : ">") << std::endl;
+  ident(o, ident_) << "<" << i.type << " " << i.name << (i.content.empty() ? " />" : ">") << std::endl;
   if (i.content.empty()) return o;
   ident_++;
   for (const auto & x : i.content) {
-    ident(o, ident_) << x << std::endl;
+    ident(o, ident_) << x;
   }
   ident_--;
   ident(o, ident_) << "</" << i.type << ">" << std::endl;
@@ -68,6 +55,18 @@ public:
     return ast_;
   }
 };
+
+static std::vector<std::string> init_str_printer_names()
+{
+  std::vector<std::string> names;
+  names.assign(TypeID_Count, "");
+#define SYMENGINE_INCLUDE_ALL
+#define SYMENGINE_ENUM(type, Class) names[type] = #Class;
+#include "symengine/type_codes.inc"
+#undef SYMENGINE_ENUM
+#undef SYMENGINE_INCLUDE_ALL
+  return names;
+}
 
 const std::vector<std::string> ExprVisitor::names_ = init_str_printer_names();
 

@@ -5,7 +5,7 @@ int main() {
   int t;
   basic_new_stack(x);
   basic_new_stack(y);
-  basic_const_pi(x);
+  symbol_set(x, "x");
   basic_cos(y, x);
   print_ast(y);
   basic_free_stack(x);
