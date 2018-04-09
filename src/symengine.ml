@@ -26,8 +26,21 @@ module BasicSym = struct
     let basic_str = foreign "basic_str" (t @-> returning (ptr char))
 
     let basic_const_zero = foreign "basic_const_zero" (t @-> returning void)
+    let basic_const_one = foreign "basic_const_one" (t @-> returning void)
+    let basic_const_minus_one = foreign "basic_const_minus_one" (t @-> returning void)
+    let basic_const_I = foreign "basic_const_I" (t @-> returning void)
+    let basic_const_pi = foreign "basic_const_pi" (t @-> returning void)
+    let basic_const_E = foreign "basic_const_E" (t @-> returning void)
+    let basic_const_EulerGamma = foreign "basic_const_EulerGamma" (t @-> returning void)
+
+    let basic_neg = foreign "basic_neg" (t @-> t @-> returning void)
+    let basic_abs = foreign "basic_abs" (t @-> t @-> returning void)
 
     let basic_add = foreign "basic_add" (t @-> t @-> t @-> returning void)
+    let basic_sub = foreign "basic_sub" (t @-> t @-> t @-> returning void)
+    let basic_mul = foreign "basic_mul" (t @-> t @-> t @-> returning void)
+    let basic_div = foreign "basic_div" (t @-> t @-> t @-> returning void)
+    let basic_pow = foreign "basic_pow" (t @-> t @-> t @-> returning void)
   end
   let create () : t =
     let x = FFI.basic_new_heap () in
@@ -38,8 +51,21 @@ module BasicSym = struct
   let binary_op (f : FFI.binary_op) x y = let z = create () in f z x y; z
 
   let zero = mk_const FFI.basic_const_zero
+  let one = mk_const FFI.basic_const_one
+  let minus_one = mk_const FFI.basic_const_minus_one
+  let i = mk_const FFI.basic_const_I
+  let pi = mk_const FFI.basic_const_pi
+  let e = mk_const FFI.basic_const_E
+  let euler_gamma = mk_const FFI.basic_const_EulerGamma
+
+  let neg = unary_op FFI.basic_neg
+  let abs = unary_op FFI.basic_abs
 
   let add = binary_op FFI.basic_add
+  let sub = binary_op FFI.basic_sub
+  let mul = binary_op FFI.basic_mul
+  let div = binary_op FFI.basic_div
+  let pow = binary_op FFI.basic_pow
 
   let to_str t = FFI.basic_str t |> from_c_string
 end
