@@ -1,8 +1,14 @@
-//
-// Created by Clouds Flowing on 4/8/18.
-//
+#pragma once
 
-#ifndef SYMENGINE_OCAML_WRAPPER_H
-#define SYMENGINE_OCAML_WRAPPER_H
+#include <caml/memory.h>
+#include <caml/alloc.h>
 
-#endif //SYMENGINE_OCAML_WRAPPER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+CAMLprim value basicsym_add(value a, value b);
+
+#ifdef __cplusplus
+}
+#endif

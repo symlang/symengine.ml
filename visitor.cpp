@@ -22,7 +22,7 @@ std::ostream& operator<<(std::ostream& o, const AST& i) {
   if (i.content.empty()) return o;
   ident_++;
   for (const auto & x : i.content) {
-    ident(o, ident_) << x;
+    o << x;
   }
   ident_--;
   ident(o, ident_) << "</" << i.type << ">" << std::endl;
