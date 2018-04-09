@@ -1,13 +1,16 @@
-all: build
-	./build/sample_cwrapper
+all: splcore binding
 
 build/build.ninja: CMakeLists.txt
 	mkdir -p build && cd build && cmake .. -GNinja
 
-build:
+splcore: build/build.ninja
 	ninja -C build
+
+binding:
+	jbuilder build @runtest
 
 clean:
 	ninja -C build -t clean
+	jbuilder clean
 
-.PHONY: all build
+.PHONY: all splcore binding
