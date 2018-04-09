@@ -1,0 +1,1 @@
+let () = Symengine.ascii_art_str () |> Format.printf "%s@."

@@ -1,1 +1,7 @@
+.vscode
+.idea
+
 build
+_build
+.merlin
+*.install

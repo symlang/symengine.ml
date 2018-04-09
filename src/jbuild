@@ -1,0 +1,9 @@
+(jbuild_version 1)
+
+(library
+ ((name symengine)
+  (public_name symengine)
+  (wrapped false)
+  (c_library_flags (:standard -L../../../build/usr/local/lib -Wl,-all_load -lsymengine -lgmp -lc++))
+  (libraries (ctypes ctypes.stubs ctypes.foreign))
+))
