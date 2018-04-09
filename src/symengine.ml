@@ -42,6 +42,7 @@ module BasicSym = struct
     type const = t -> unit
     type unary_op = t -> t -> int
     type binary_op = t -> t -> t -> int
+    type binary_relation = t -> t -> bool
     let basic_new_heap = foreign "basic_new_heap" (void @-> returning t)
     let basic_free_heap = foreign "basic_free_heap" (t @-> returning void)
     let basic_str = foreign "basic_str" (t @-> returning (ptr char))
@@ -62,6 +63,31 @@ module BasicSym = struct
     let basic_mul = foreign "basic_mul" (t @-> t @-> t @-> returning error_code_t)
     let basic_div = foreign "basic_div" (t @-> t @-> t @-> returning error_code_t)
     let basic_pow = foreign "basic_pow" (t @-> t @-> t @-> returning error_code_t)
+
+    let basic_sin = foreign "basic_sin" (t @-> t @-> returning error_code_t)
+    let basic_cos = foreign "basic_cos" (t @-> t @-> returning error_code_t)
+    let basic_tan = foreign "basic_tan" (t @-> t @-> returning error_code_t)
+    let basic_asin = foreign "basic_asin" (t @-> t @-> returning error_code_t)
+    let basic_acos = foreign "basic_acos" (t @-> t @-> returning error_code_t)
+    let basic_atan = foreign "basic_atan" (t @-> t @-> returning error_code_t)
+    let basic_sinh = foreign "basic_sinh" (t @-> t @-> returning error_code_t)
+    let basic_cosh = foreign "basic_cosh" (t @-> t @-> returning error_code_t)
+    let basic_tanh = foreign "basic_tanh" (t @-> t @-> returning error_code_t)
+    let basic_asinh = foreign "basic_asinh" (t @-> t @-> returning error_code_t)
+    let basic_acosh = foreign "basic_acosh" (t @-> t @-> returning error_code_t)
+    let basic_atanh = foreign "basic_atanh" (t @-> t @-> returning error_code_t)
+
+    let basic_exp = foreign "basic_exp" (t @-> t @-> returning error_code_t)
+    let basic_log = foreign "basic_log" (t @-> t @-> returning error_code_t)
+
+    let basic_expand = foreign "basic_expand" (t @-> t @-> returning error_code_t)
+    let rational_set_si = foreign "rational_set_si" (t @-> int @-> int @-> returning error_code_t)
+    let rational_set_ui = foreign "rational_set_ui" (t @-> uint @-> uint @-> returning error_code_t)
+    let rational_set = foreign "rational_set" (t @-> t @-> t @-> returning error_code_t)
+    let complex_set = foreign "complex_set" (t @-> t @-> t @-> returning error_code_t)
+
+    let basic_eq = foreign "basic_eq" (t @-> t @-> returning bool)
+    let basic_neq = foreign "basic_neq" (t @-> t @-> returning bool)
   end
   let create () : t =
     let x = FFI.basic_new_heap () in
@@ -70,9 +96,12 @@ module BasicSym = struct
   let unwrap_error i = match error_code_of_int i with
     | NoException -> ()
     | x -> raise (Error (x, ""))
-  let mk_const (f : FFI.const) = let z = create () in f z; z
-  let unary_op (f : FFI.unary_op) x = let z = create () in f z x |> unwrap_error; z
-  let binary_op (f : FFI.binary_op) x y = let z = create () in f z x y |> unwrap_error; z
+  let mk_const (f: FFI.const) = let z = create () in f z; z
+  let unary_fn (f: FFI.unary_op) x = let z = create () in f z x |> unwrap_error; z
+  let binary_fn (f: FFI.binary_op) x y = let z = create () in f z x y |> unwrap_error; z
+  let binary_relation (f: FFI.binary_relation) x y = let z = f x y in z
+  let unary_op = unary_fn
+  let binary_op = binary_fn
 
   let zero = mk_const FFI.basic_const_zero
   let one = mk_const FFI.basic_const_one
@@ -91,5 +120,31 @@ module BasicSym = struct
   let div = binary_op FFI.basic_div
   let pow = binary_op FFI.basic_pow
 
-  let to_str t = FFI.basic_str t |> from_c_string
+  let sin = unary_fn FFI.basic_sin
+  let cos = unary_fn FFI.basic_cos
+  let tan = unary_fn FFI.basic_tan
+  let asin = unary_fn FFI.basic_asin
+  let acos = unary_fn FFI.basic_acos
+  let atan = unary_fn FFI.basic_atan
+  let sinh = unary_fn FFI.basic_sinh
+  let cosh = unary_fn FFI.basic_cosh
+  let tanh = unary_fn FFI.basic_tanh
+  let asinh = unary_fn FFI.basic_asinh
+  let acosh = unary_fn FFI.basic_acosh
+  let atanh = unary_fn FFI.basic_atanh
+
+  let exp = unary_fn FFI.basic_exp
+  let log = unary_fn FFI.basic_log
+
+  let expand = unary_fn FFI.basic_expand
+
+  let rational_si x y = let z = create () in FFI.rational_set_si z x y |> unwrap_error; z
+  let rational_ui x y = let z = create () in FFI.rational_set_ui z x y |> unwrap_error; z
+  let rational = binary_fn FFI.rational_set
+  let complex = binary_fn FFI.complex_set
+
+  let eq = binary_relation FFI.basic_eq
+  let neq = binary_relation FFI.basic_neq
+
+  let to_str (t: t) = FFI.basic_str t |> from_c_string
 end
