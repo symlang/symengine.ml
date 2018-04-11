@@ -9,7 +9,6 @@
  ((name symengine)
   (public_name symengine)
   (wrapped false)
-  #; (c_library_flags (:standard -L../../build/symengine/symengine -Wl,-all_load -lsymengine -lgmp -lc++))
-  (c_library_flags (:include c_library_flags.sexp))
+  (c_library_flags (-Wl,-all_load (:include c_library_flags.sexp)))
   (libraries (ctypes ctypes.stubs ctypes.foreign))
 ))

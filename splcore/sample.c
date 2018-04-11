@@ -2,7 +2,6 @@
 
 int main() {
   basic x, y, z;
-  int t;
   basic_new_stack(x);
   basic_new_stack(y);
   basic_new_stack(z);
