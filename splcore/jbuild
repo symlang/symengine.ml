@@ -2,7 +2,7 @@
 
 (rule
  ((targets (c_flags.sexp c_library_flags.sexp))
-  (deps (../src/config/find_library.exe))
+  (deps (config/find_library.exe))
   (action (run ${<} -ocamlc ${OCAMLC}))))
 
 (library

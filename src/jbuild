@@ -1,14 +1,16 @@
 (jbuild_version 1)
 
 (rule
- ((targets (c_flags.sexp c_library_flags.sexp))
-  (deps (config/find_library.exe))
-  (action (run ${<} -ocamlc ${OCAMLC}))))
+ ((targets (libsymengine_stubs.a))
+  (deps (${ROOT}/build/symengine/symengine/libsymengine.a))
+  (action (copy ${<} ${@}))
+))
 
 (library
  ((name symengine)
   (public_name symengine)
   (wrapped false)
-  (c_library_flags (-Wl,-all_load (:include c_library_flags.sexp)))
+  (c_library_flags (:standard -Wl,-all_load -lgmp -lc++))
   (libraries (ctypes ctypes.stubs ctypes.foreign))
+  (self_build_stubs_archive (symengine_stub))
 ))
