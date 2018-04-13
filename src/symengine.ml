@@ -202,6 +202,11 @@ module BasicSym = struct
   let pow = binary_op FFI.basic_pow
   let diff = binary_op FFI.basic_diff
 
+  let ( +: ) = add
+  let ( -: ) = sub
+  let ( *: ) = mul
+  let ( /: ) = div
+
   let erf = unary_fn FFI.basic_erf
   let erfc = unary_fn FFI.basic_erfc
   let sin = unary_fn FFI.basic_sin
