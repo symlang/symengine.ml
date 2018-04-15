@@ -1,9 +1,21 @@
 (jbuild_version 1)
 
 (rule
- ((targets (libsymengine_stubs.a))
+ ((targets (libsymengine.a))
   (deps (${ROOT}/build/symengine/symengine/libsymengine.a))
   (action (copy ${<} ${@}))
+))
+
+(rule
+ ((targets (libsymengine_stubs.a))
+  (deps (libsymengine.a visitor.o))
+  (action (bash "cp ${<} ${@} && ar rcs ${@} visitor.o"))
+))
+
+(rule
+ ((targets (visitor.o))
+  (deps (visitor.cpp visitor.h libsymengine.a))
+  (action (bash "${CXX} -c -I/usr/local/lib/ocaml -I../../../build/symengine -I../../../symengine -std=c++14 -o ${@} ${<}"))
 ))
 
 (library

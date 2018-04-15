@@ -159,6 +159,11 @@ module BasicSym = struct
 
     let basic_eq = foreign "basic_eq" (t @-> t @-> returning bool)
     let basic_neq = foreign "basic_neq" (t @-> t @-> returning bool)
+
+    module Extended = struct
+      (* let visit a = foreign "visit" (t @-> funptr (t @-> returning a) @-> returning a) *)
+      external visit : t -> (string -> 'a array -> 'a) -> 'a = "basicsym_visit"
+    end
   end
   let create () : t =
     let x = FFI.basic_new_heap () in
@@ -272,4 +277,30 @@ module BasicSym = struct
   let neq = binary_relation FFI.basic_neq
 
   let to_str (t: t) = FFI.basic_str t |> from_c_string
+
+  module type VisitorType = sig
+    type a
+    val visit_basic : string -> a array -> a
+  end
+
+  type expr =
+  | Const of string
+  | Symbol of string
+  | Func of string * expr array
+
+  module ExprVisitorType = struct
+    type a = expr
+    let visit_basic name = function
+    | [| |] -> Const name
+    | children -> Func (name, children)
+  end
+
+  module Visitor (T : VisitorType) = struct
+    include T
+    let visit root = FFI.Extended.visit root visit_basic
+  end
+
+  module ExprVistor = Visitor(ExprVisitorType)
+
+  let expr : t -> expr = ExprVistor.visit
 end
