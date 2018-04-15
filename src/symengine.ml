@@ -73,7 +73,7 @@ module BasicSym = struct
 
     let basic_get_type = foreign "basic_get_type" (t @-> returning type_t)
     let basic_get_class_id = foreign "basic_get_class_id" (string @-> returning type_t)
-    let basic_get_class_from_id = foreign "basic_get_class_from_id" (t @-> returning (ptr char))
+    let basic_get_class_from_id = foreign "basic_get_class_from_id" (type_t @-> returning (ptr char))
 
     let symbol_set = foreign "symbol_set" (t @-> string @-> returning error_code_t)
 
@@ -164,7 +164,9 @@ module BasicSym = struct
       (* let visit a = foreign "visit" (t @-> funptr (t @-> returning a) @-> returning a) *)
       type ptr = nativeint
       let to_raw = Ctypes.raw_address_of_ptr
-      external visit : ptr -> (string -> 'a array -> 'a) -> 'a = "basicsym_visit"
+      let from_raw = Ctypes.ptr_of_raw_address
+      let fix_raw f = let f t = f (from_raw t) in f
+      external visit : ptr -> (ptr -> 'a array -> 'a) -> 'a = "basicsym_visit"
     end
   end
   let create () : t =
@@ -279,30 +281,15 @@ module BasicSym = struct
   let neq = binary_relation FFI.basic_neq
 
   let to_str (t: t) = FFI.basic_str t |> from_c_string
+  let get_class (t: t) = FFI.basic_get_type t |> FFI.basic_get_class_from_id |> from_c_string
 
   module type VisitorType = sig
     type a
-    val visit_basic : string -> a array -> a
-  end
-
-  type expr =
-  | Const of string
-  | Symbol of string
-  | Func of string * expr array
-
-  module ExprVisitorType = struct
-    type a = expr
-    let visit_basic name = function
-    | [| |] -> Const name
-    | children -> Func (name, children)
+    val visit_basic : t -> a array -> a
   end
 
   module Visitor (T : VisitorType) = struct
     include T
-    let visit root = FFI.Extended.(visit (to_raw root) visit_basic)
+    let visit root = FFI.Extended.(visit (to_raw root) (fix_raw visit_basic))
   end
-
-  module ExprVistor = Visitor(ExprVisitorType)
-
-  let expr : t -> expr = ExprVistor.visit
 end
