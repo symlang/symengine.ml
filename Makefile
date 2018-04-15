@@ -1,9 +1,9 @@
-all: splcore binding
+all: symengine binding
 
-build/build.ninja: CMakeLists.txt
-	mkdir -p build && cd build && cmake .. -GNinja
+build/build.ninja: symengine/CMakeLists.txt
+	mkdir -p build && cd build && cmake ../symengine -GNinja
 
-splcore: build/build.ninja
+symengine: build/build.ninja
 	ninja -C build
 
 binding:
@@ -13,4 +13,4 @@ clean:
 	ninja -C build -t clean
 	jbuilder clean
 
-.PHONY: all splcore binding
+.PHONY: all symengine binding
