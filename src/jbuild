@@ -15,7 +15,7 @@
 (rule
  ((targets (visitor.o))
   (deps (visitor.cpp visitor.h libsymengine.a))
-  (action (bash "${CXX} -c -I/usr/local/lib/ocaml -I../../../build/symengine -I../../../symengine -std=c++14 -o ${@} ${<}"))
+  (action (bash "${CXX} -g -c -I/usr/local/lib/ocaml -I../../../build/symengine -I../../../symengine -std=c++14 -o ${@} ${<}"))
 ))
 
 (library

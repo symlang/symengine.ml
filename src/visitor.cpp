@@ -48,6 +48,7 @@ public:
   ExprVisitor(value cb) : a(Val_unit), cb(cb) {
     caml_register_generational_global_root(&this->a);
     caml_register_generational_global_root(&this->cb);
+    // caml_garbage_collection();
   }
   ~ExprVisitor() {
     caml_remove_generational_global_root(&this->cb);
@@ -104,7 +105,7 @@ struct CRCPBasic {
 CAMLprim value basicsym_visit(value root, value visitor) {
   CAMLparam2(root, visitor);
   CAMLlocal1(result);
-  auto x = reinterpret_cast<CRCPBasic*>(Data_custom_val(root));
+  auto x = reinterpret_cast<CRCPBasic*>(Nativeint_val(root));
   ExprVisitor exprVisitor(visitor);
   result = exprVisitor.apply(x->m);
   CAMLreturn(result);

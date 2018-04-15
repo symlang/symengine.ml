@@ -162,7 +162,9 @@ module BasicSym = struct
 
     module Extended = struct
       (* let visit a = foreign "visit" (t @-> funptr (t @-> returning a) @-> returning a) *)
-      external visit : t -> (string -> 'a array -> 'a) -> 'a = "basicsym_visit"
+      type ptr = nativeint
+      let to_raw = Ctypes.raw_address_of_ptr
+      external visit : ptr -> (string -> 'a array -> 'a) -> 'a = "basicsym_visit"
     end
   end
   let create () : t =
@@ -297,7 +299,7 @@ module BasicSym = struct
 
   module Visitor (T : VisitorType) = struct
     include T
-    let visit root = FFI.Extended.visit root visit_basic
+    let visit root = FFI.Extended.(visit (to_raw root) visit_basic)
   end
 
   module ExprVistor = Visitor(ExprVisitorType)
