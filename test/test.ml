@@ -9,10 +9,12 @@ module Expr = struct
 
   module Type = struct
     type a = t
-    let visit_basic t = function
-    | [| |] -> Const (to_str t)
-    | children -> Func ((get_class t), children)
-    let visit_table = Hashtbl.create 1
+    let visit_basic t children = Func ((get_class t), children)
+    let visit_table =
+      let t = Hashtbl.create 1 in
+      Hashtbl.add t Type_codes.Constant (fun t _ -> Const (to_str t));
+      Hashtbl.add t Type_codes.Symbol (fun t _ -> Symbol (to_str t));
+      t
   end
   module Visitor = Visitor2(Type)
 

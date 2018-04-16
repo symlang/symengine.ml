@@ -48,7 +48,7 @@ module BasicSym = struct
   module type VisitorTableType = sig
     type a
     val visit_basic : t -> a array -> a
-    val visit_table : (string, t -> a array -> a) Hashtbl.t
+    val visit_table : (Type_codes.class_name, t -> a array -> a) Hashtbl.t
   end
 
   module FFI = struct
@@ -302,7 +302,7 @@ module BasicSym = struct
   module Visitor2 (T : VisitorTableType) = struct
     let visit_table =
       let table = Array.make Type_codes.class_count (FFI.Extended.fix_raw T.visit_basic) in
-      Hashtbl.iter (fun k v -> table.(FFI.basic_get_class_id k) <- (FFI.Extended.fix_raw v)) T.visit_table;
+      Hashtbl.iter (fun k v -> table.(Type_codes.id_of_class_name k) <- (FFI.Extended.fix_raw v)) T.visit_table;
       table
     let visit root = FFI.Extended.(visit2 (to_raw root) visit_table)
   end
