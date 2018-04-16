@@ -12,8 +12,9 @@ module Expr = struct
     let visit_basic t = function
     | [| |] -> Const (to_str t)
     | children -> Func ((get_class t), children)
+    let visit_table = Hashtbl.create 1
   end
-  module Visitor = Visitor(Type)
+  module Visitor = Visitor2(Type)
 
   let expr : BasicSym.t -> t = Visitor.visit
 end

@@ -18,6 +18,18 @@
   (action (bash "${CXX} -g -c -I/usr/local/lib/ocaml -I../../../build -I../../../symengine -std=c++14 -o ${@} ${<}"))
 ))
 
+(rule
+ ((targets (config.exe))
+  (deps (config.cpp))
+  (action (bash "${CXX} -g -DBASICSYM_OCAML_CONFIG -I/usr/local/lib/ocaml -I../../../build -I../../../symengine -lc++ -std=c++14 -o ${@} ${<}"))
+))
+
+(rule
+ ((targets (type_codes.ml))
+  (deps (config.exe))
+  (action (bash "./config.exe ${@}"))
+))
+
 (library
  ((name symengine)
   (public_name symengine)

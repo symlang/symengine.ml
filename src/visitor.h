@@ -11,3 +11,4 @@
 #endif
 
 EXPORT CAMLprim value basicsym_visit(value root, value visitor);
+EXPORT CAMLprim value basicsym_visit2(value root, value visitors);

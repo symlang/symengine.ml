@@ -64,6 +64,54 @@ public:
   }
 };
 
+class ExprTableVisitor : public BaseVisitor<ExprTableVisitor, ExprVisitor>  {
+protected:
+  value cbs;
+  int len;
+public:
+  enum class CB_CODE {
+    BASIC = 0,
+#define SYMENGINE_INCLUDE_ALL
+#define SYMENGINE_ENUM(type, Class) type,
+#include "symengine/type_codes.inc"
+#undef SYMENGINE_ENUM
+#undef SYMENGINE_INCLUDE_ALL
+    Count,
+  };
+  ExprTableVisitor(value cbs) : BaseVisitor(Field(cbs, 0)), cbs(cbs), len(Wosize_val(cbs)) {
+    caml_register_global_root(&this->cbs);
+  }
+  ~ExprTableVisitor() {
+    caml_remove_global_root(&this->cbs);
+  }
+  inline value callback(value cb, const Basic *x) {
+    CAMLparam1(cb);
+    CAMLlocal3(curr, children, result);
+    basic c;
+    c->m = x->rcp_from_this();
+    curr = caml_copy_nativeint((long)c);
+    children = apply(x->get_args());
+    result = caml_callback2(cb, curr, children);
+    CAMLreturn(result);
+  }
+  inline value get_cb(CB_CODE code) {
+    int i = static_cast<int>(code);
+    if (i >= len) return cb;
+    value r = Field(cbs, i);
+    if (r == Val_unit) return cb;
+    return r;
+  }
+
+  using ExprVisitor::bvisit;
+
+#define SYMENGINE_ENUM(type, Class) \
+  void bvisit(const Class &x) { \
+    caml_modify_generational_global_root(&a, callback(get_cb(CB_CODE::type), &x)); \
+  }
+#include "symengine/type_codes.inc"
+#undef SYMENGINE_ENUM
+};
+
 static std::vector<std::string> init_str_printer_names()
 {
   std::vector<std::string> names;
@@ -83,6 +131,15 @@ CAMLprim value basicsym_visit(value root, value visitor) {
   CAMLlocal1(result);
   auto x = reinterpret_cast<CRCPBasic*>(Nativeint_val(root));
   ExprVisitor exprVisitor(visitor);
+  result = exprVisitor.apply(x->m);
+  CAMLreturn(result);
+}
+
+CAMLprim value basicsym_visit2(value root, value visitors) {
+  CAMLparam2(root, visitors);
+  CAMLlocal1(result);
+  auto x = reinterpret_cast<CRCPBasic*>(Nativeint_val(root));
+  ExprTableVisitor exprVisitor(visitors);
   result = exprVisitor.apply(x->m);
   CAMLreturn(result);
 }

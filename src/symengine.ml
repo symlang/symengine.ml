@@ -40,6 +40,17 @@ module BasicSym = struct
 
   let type_t = int
 
+  module type VisitorType = sig
+    type a
+    val visit_basic : t -> a array -> a
+  end
+
+  module type VisitorTableType = sig
+    type a
+    val visit_basic : t -> a array -> a
+    val visit_table : (string, t -> a array -> a) Hashtbl.t
+  end
+
   module FFI = struct
     type const = t -> unit
     type unary_op = t -> t -> int
@@ -167,6 +178,7 @@ module BasicSym = struct
       let from_raw = Ctypes.ptr_of_raw_address
       let fix_raw f = let f t = f (from_raw t) in f
       external visit : ptr -> (ptr -> 'a array -> 'a) -> 'a = "basicsym_visit"
+      external visit2 : ptr -> (ptr -> 'a array -> 'a) array -> 'a = "basicsym_visit2"
     end
   end
   let create () : t =
@@ -283,13 +295,15 @@ module BasicSym = struct
   let to_str (t: t) = FFI.basic_str t |> from_c_string
   let get_class (t: t) = FFI.basic_get_type t |> FFI.basic_get_class_from_id |> from_c_string
 
-  module type VisitorType = sig
-    type a
-    val visit_basic : t -> a array -> a
+  module Visitor (T : VisitorType) = struct
+    let visit root = FFI.Extended.(visit (to_raw root) (fix_raw T.visit_basic))
   end
 
-  module Visitor (T : VisitorType) = struct
-    include T
-    let visit root = FFI.Extended.(visit (to_raw root) (fix_raw visit_basic))
+  module Visitor2 (T : VisitorTableType) = struct
+    let visit_table =
+      let table = Array.make Type_codes.class_count (FFI.Extended.fix_raw T.visit_basic) in
+      Hashtbl.iter (fun k v -> table.(FFI.basic_get_class_id k) <- (FFI.Extended.fix_raw v)) T.visit_table;
+      table
+    let visit root = FFI.Extended.(visit2 (to_raw root) visit_table)
   end
 end
