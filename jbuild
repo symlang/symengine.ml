@@ -2,9 +2,7 @@
 
 (rule
  ((targets (symengine.buildstamp))
-  (deps (Makefile
-         symengine/CMakeLists.txt
-         (files_recursively_in symengine/cmake)
-         (files_recursively_in symengine/symengine)))
-  (action (run ${MAKE} symengine))
+  (deps ((files_recursively_in build/lib)
+         (files_recursively_in build/include)))
+  (action (run touch ${@}))
 ))

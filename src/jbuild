@@ -1,27 +1,15 @@
 (jbuild_version 1)
 
 (rule
- ((targets (libsymengine.a))
-  (deps (${ROOT}/symengine.buildstamp))
-  (action (bash "cp ${ROOT}/build/lib/libsymengine.a ${@}"))
-))
-
-(rule
  ((targets (libsymengine_stubs.a))
-  (deps (libsymengine.a visitor.o))
-  (action (bash "cp ${<} ${@} && ar rcs ${@} visitor.o"))
-))
-
-(rule
- ((targets (visitor.o))
-  (deps (visitor.cpp visitor.h libsymengine.a))
-  (action (bash "${CXX} -g -c -I/usr/local/lib/ocaml -I${ROOT}/build/include -std=c++14 -o ${@} ${<}"))
+  (deps (visitor.o ${ROOT}/symengine.buildstamp))
+  (action (bash "cp ${ROOT}/build/lib/libsymengine.a ${@} && ar rcs ${@} visitor.o"))
 ))
 
 (rule
  ((targets (config.exe))
-  (deps (config.cpp))
-  (action (bash "${CXX} -g -I${ROOT}/symengine -lc++ -std=c++14 -o ${@} ${<}"))
+  (deps (config.cpp ${ROOT}/symengine.buildstamp))
+  (action (bash "${CXX} -g -I${ROOT}/build/include -lc++ -std=c++14 -o ${@} ${<}"))
 ))
 
 (rule
@@ -35,6 +23,8 @@
  ((name symengine)
   (public_name symengine)
   (wrapped false)
+  (cxx_names (visitor))
+  (cxx_flags (:standard -I${ROOT}/build/include -std=c++14))
   (c_library_flags (:standard -Wl,-all_load -lgmp -lc++))
   (libraries (ctypes ctypes.stubs ctypes.foreign))
   (self_build_stubs_archive (symengine_stub))
