@@ -27,6 +27,7 @@
 (rule
  ((targets (type_codes.ml))
   (deps (config.exe))
+  (mode promote)
   (action (bash "./config.exe ${@}"))
 ))
 
