@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(rule
+ ((targets (symengine.buildstamp))
+  (deps (Makefile
+         symengine/CMakeLists.txt
+         (files_recursively_in symengine/cmake)
+         (files_recursively_in symengine/symengine)))
+  (action (run ${MAKE} symengine))
+))
