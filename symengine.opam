@@ -1,0 +1,16 @@
+opam-version: "1.2"
+name: "symengine"
+version: "0.1"
+maintainer: "Clouds <clouds.flowing@gmail.com>"
+homepage: "https://github.com/symlang/symengine.ml"
+bug-reports: "https://github.com/symlang/symengine.ml/issues"
+license: ""
+dev-repo: "https://github.com/symengine/symengine"
+build: [
+  [make]
+]
+depends: [
+  "ctypes"
+  "ctypes-foreign"
+  "jbuilder" {build}
+]
