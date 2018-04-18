@@ -1,7 +1,9 @@
 all: binding
 
 build/build.ninja: symengine/CMakeLists.txt
-	mkdir -p build && cd build && cmake ../symengine -GNinja -DBUILD_TESTS=no -DBUILD_BENCHMARKS=no -DCMAKE_INSTALL_PREFIX=.
+	mkdir -p build
+	rm -f build/CMakeCache.txt
+	cmake -Bbuild -Hsymengine -GNinja -DBUILD_TESTS=no -DBUILD_BENCHMARKS=no -DCMAKE_INSTALL_PREFIX=.
 
 symengine: build/build.ninja
 	ninja -C build install
