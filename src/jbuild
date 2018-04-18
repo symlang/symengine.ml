@@ -2,7 +2,7 @@
 
 (rule
  ((targets (libsymengine_stubs.a dllsymengine_stubs.so))
-  (deps (visitor.o ${ROOT}/symengine.buildstamp))
+  (deps (visitor_native.o ${ROOT}/symengine.buildstamp))
   (action (bash "
     ar -x ${ROOT}/build/lib/libsymengine.a
     ocamlmklib.opt -g -o symengine_stubs *.o -lgmp -lc++"))
@@ -30,8 +30,7 @@
 (library
  ((name symengine)
   (public_name symengine)
-  (wrapped false)
-  (cxx_names (visitor))
+  (cxx_names (visitor_native))
   (cxx_flags (:include cxx_flags.sexp))
   (c_library_flags (:standard -Wl,-all_load -lgmp -lc++))
   (libraries (ctypes ctypes.stubs ctypes.foreign))

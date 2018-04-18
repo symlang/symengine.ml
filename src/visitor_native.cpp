@@ -1,5 +1,5 @@
 #include "symengine/visitor.h"
-#include "visitor.h"
+#include "visitor_native.h"
 #include <caml/callback.h>
 
 using namespace SymEngine;

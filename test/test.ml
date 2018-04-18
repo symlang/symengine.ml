@@ -16,7 +16,7 @@ module Expr = struct
       Hashtbl.add t Type_codes.Symbol (fun t _ -> Symbol (to_str t));
       t
   end
-  module Visitor = Visitor2(Type)
+  module Visitor = Symengine.Visitor.Visitor2(Type)
 
   let expr : BasicSym.t -> t = Visitor.visit
 end
@@ -37,6 +37,6 @@ let dump_expr oc =
   d 0
 
 let () =
-  Symengine.ascii_art_str () |> Format.printf "%s@.";
+  Symengine.Utils.ascii_art_str () |> Format.printf "%s@.";
   Symengine.BasicSym.(cos pi |> expand |> to_str) |> Format.printf "cos(pi) = %s@.";
   Symengine.BasicSym.(pow e (pi *: i) |> Expr.expr ) |> Format.printf "e^(pi*I) = %a@." dump_expr
